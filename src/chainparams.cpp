@@ -99,11 +99,11 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xf9;
-        pchMessageStart[1] = 0xbe;
-        pchMessageStart[2] = 0xb4;
-        pchMessageStart[3] = 0xd9;
-        nDefaultPort = 8333;
+        pchMessageStart[0] = 0xe8;
+        pchMessageStart[1] = 0x89;
+        pchMessageStart[2] = 0xfe;
+        pchMessageStart[3] = 0x91;
+        nDefaultPort = 8433;
         nPruneAfterHeight = 100000;
         m_assumed_blockchain_size = 350;
         m_assumed_chain_state_size = 6;
@@ -207,11 +207,11 @@ public:
         consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000001db6ec4ac88cf2272c6");
         consensus.defaultAssumeValid = uint256S("0x000000000000006433d1efec504c53ca332b64963c425395515b01977bd7b3b0"); // 1864000
 
-        pchMessageStart[0] = 0x0b;
-        pchMessageStart[1] = 0x11;
-        pchMessageStart[2] = 0x09;
-        pchMessageStart[3] = 0x07;
-        nDefaultPort = 18333;
+        pchMessageStart[0] = 0x83;
+        pchMessageStart[1] = 0xeb;
+        pchMessageStart[2] = 0xf3;
+        pchMessageStart[3] = 0xef;
+        nDefaultPort = 18433;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 40;
         m_assumed_chain_state_size = 2;
@@ -401,11 +401,11 @@ public:
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
 
-        pchMessageStart[0] = 0xfa;
-        pchMessageStart[1] = 0xbf;
-        pchMessageStart[2] = 0xb5;
-        pchMessageStart[3] = 0xda;
-        nDefaultPort = 18444;
+        pchMessageStart[0] = 0xb2;
+        pchMessageStart[1] = 0x98;
+        pchMessageStart[2] = 0xc4;
+        pchMessageStart[3] = 0xb7;
+        nDefaultPort = 18544;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
