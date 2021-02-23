@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\openssl.1.0.1.21\build\native\openssl.props" Condition="Exists('..\packages\openssl.1.0.1.21\build\native\openssl.props')" />
   <Import Project="..\common.init.vcxproj" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D4513DDF-6013-44DC-ADCC-12EAF6D1F038}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -43,6 +45,9 @@
       <Project>{18430fef-6b61-4c53-b396-718e02850f1b}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Label="ReplaceInFile" Project="..\msbuild\tasks\replaceinfile.targets" />
@@ -50,30 +55,62 @@
     <ConfigIniIn>..\..\test\config.ini.in</ConfigIniIn>
     <ConfigIniOut>..\..\test\config.ini</ConfigIniOut>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(ConfigIniIn)" DestinationFiles="$(ConfigIniOut)" ></Copy>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                   Replace="@PACKAGE_NAME@" By="Bitcoin Core"></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                   Replace="@abs_top_srcdir@" By="..\.." ToFullPath="true"></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                   Replace="@abs_top_builddir@" By="..\.." ToFullPath="true"></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                   Replace="@EXEEXT@" By=".exe"></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@ENABLE_WALLET_TRUE@" By=""></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@USE_BDB_TRUE@" By=""></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@USE_SQLITE_TRUE@" By=""></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@BUILD_BITCOIN_CLI_TRUE@" By=""></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@BUILD_BITCOIND_TRUE@" By=""></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@ENABLE_FUZZ_TRUE@" By=""></ReplaceInFile>
-    <ReplaceInFile FilePath="$(ConfigIniOut)"
-                  Replace="@ENABLE_ZMQ_TRUE@" By=""></ReplaceInFile>
+    <Copy SourceFiles="$(ConfigIniIn)" DestinationFiles="$(ConfigIniOut)">
+    </Copy>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@PACKAGE_NAME@" By="Bitcoin Core">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@abs_top_srcdir@" By="..\.." ToFullPath="true">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@abs_top_builddir@" By="..\.." ToFullPath="true">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@EXEEXT@" By=".exe">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@ENABLE_WALLET_TRUE@" By="">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@USE_BDB_TRUE@" By="">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@USE_SQLITE_TRUE@" By="">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@BUILD_BITCOIN_CLI_TRUE@" By="">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@BUILD_BITCOIND_TRUE@" By="">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@ENABLE_FUZZ_TRUE@" By="">
+    </ReplaceInFile>
+    <ReplaceInFile FilePath="$(ConfigIniOut)" Replace="@ENABLE_ZMQ_TRUE@" By="">
+    </ReplaceInFile>
   </Target>
   <Import Project="..\common.vcxproj" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este projeto faz referência a pacotes do NuGet que não estão presentes neste computador. Use a Restauração de Pacotes do NuGet para baixá-los.  Para obter mais informações, consulte http://go.microsoft.com/fwlink/?LinkID=322105. O arquivo ausente é {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\curl.redist.7.30.0.2\build\native\curl.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\curl.redist.7.30.0.2\build\native\curl.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\openssl.redist.1.0.1.21\build\native\openssl.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl.redist.1.0.1.21\build\native\openssl.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib.redist.1.2.8.1\build\native\zlib.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.redist.1.2.8.1\build\native\zlib.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib.1.2.8.1\build\native\zlib.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.1.2.8.1\build\native\zlib.targets'))" />
+    <Error Condition="!Exists('..\packages\openssl.1.0.1.21\build\native\openssl.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl.1.0.1.21\build\native\openssl.props'))" />
+    <Error Condition="!Exists('..\packages\openssl.1.0.1.21\build\native\openssl.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl.1.0.1.21\build\native\openssl.targets'))" />
+    <Error Condition="!Exists('..\packages\libssh2.redist.1.4.3.3\build\native\libssh2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libssh2.redist.1.4.3.3\build\native\libssh2.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\libssh2.1.4.3.3\build\native\libssh2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libssh2.1.4.3.3\build\native\libssh2.targets'))" />
+  </Target>
+  <Import Project="..\packages\curl.redist.7.30.0.2\build\native\curl.redist.targets" Condition="Exists('..\packages\curl.redist.7.30.0.2\build\native\curl.redist.targets')" />
+  <Import Project="..\packages\openssl.redist.1.0.1.21\build\native\openssl.redist.targets" Condition="Exists('..\packages\openssl.redist.1.0.1.21\build\native\openssl.redist.targets')" />
+  <Import Project="..\packages\zlib.redist.1.2.8.1\build\native\zlib.redist.targets" Condition="Exists('..\packages\zlib.redist.1.2.8.1\build\native\zlib.redist.targets')" />
+  <Import Project="..\packages\zlib.1.2.8.1\build\native\zlib.targets" Condition="Exists('..\packages\zlib.1.2.8.1\build\native\zlib.targets')" />
+  <Import Project="..\packages\openssl.1.0.1.21\build\native\openssl.targets" Condition="Exists('..\packages\openssl.1.0.1.21\build\native\openssl.targets')" />
+  <Import Project="..\packages\libssh2.redist.1.4.3.3\build\native\libssh2.redist.targets" Condition="Exists('..\packages\libssh2.redist.1.4.3.3\build\native\libssh2.redist.targets')" />
+  <Import Project="..\packages\libssh2.1.4.3.3\build\native\libssh2.targets" Condition="Exists('..\packages\libssh2.1.4.3.3\build\native\libssh2.targets')" />
 </Project>

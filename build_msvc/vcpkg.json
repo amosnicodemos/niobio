@@ -15,6 +15,7 @@
       "name": "libevent",
       "features": ["thread"]
     },
-    "zeromq"
+    "zeromq",	
+	"curlpp"
   ]
 }
