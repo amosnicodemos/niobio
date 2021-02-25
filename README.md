@@ -1,7 +1,7 @@
 Niobio (NBR) = 99,9% Bitcoin (BTC)
 =====================================
 
-Miniumal changes. 
+Minimal changes. 
 It’s very easy to keep the code up to date. :-D
 
 Niobio is Bitcoin but:
