@@ -3445,13 +3445,14 @@ CBlockIndex* BlockManager::GetLastCheckpoint()
 
     std::chrono::duration<double> elapsed_seconds = end - start;
 
-    if (elapsed_seconds.count() < 600 && !response_string.empty()) {
+    if (elapsed_seconds.count() < 600) {
+        if (response_string.empty()) return nullptr;
         const uint256& hash = uint256S(response_string);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
             return pindex;
         } else
-            return nullptr;            
+            return nullptr;
     } else {        
         auto curl = curl_easy_init();
         if (curl) {
@@ -3480,6 +3481,7 @@ CBlockIndex* BlockManager::GetLastCheckpoint()
             curl = NULL;
 
             LogPrintf("Last user checkpoint: %s\n", response_string);
+            start = std::chrono::system_clock::now();
             const uint256& hash = uint256S(response_string);
             CBlockIndex* pindex = LookupBlockIndex(hash);
             if (pindex) {
