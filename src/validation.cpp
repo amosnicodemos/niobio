@@ -3439,7 +3439,7 @@ size_t writeFunction(void* ptr, size_t size, size_t nmemb, std::string* data)
 
 CBlockIndex* BlockManager::GetLastCheckpoint()
 {
-    static std::string response_string;    
+    static std::string response_string;
     auto static start = std::chrono::system_clock::now();    
     auto end = std::chrono::system_clock::now();
 
@@ -3452,7 +3452,7 @@ CBlockIndex* BlockManager::GetLastCheckpoint()
             return pindex;
         } else
             return nullptr;            
-    } else {
+    } else {        
         auto curl = curl_easy_init();
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/soldate/niobiocoin/master/bestblockhash.txt");
