@@ -16,8 +16,6 @@ sudo apt install libcurl4-openssl-dev
 
 **To Build: DO NOT MAKE INSTALL**
 
-Your data folder in /home/youruser/.niobiocoin
-
 * ./autogen.sh
 * ./configure
 * ./make 
@@ -25,3 +23,5 @@ Your data folder in /home/youruser/.niobiocoin
 
 *Please rename bin file bitcoind to niobiocoind*
 * mv ./src/bitcoind ./src/niobiocoind
+
+Your data folder in /home/youruser/.niobiocoin
