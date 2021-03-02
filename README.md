@@ -7,7 +7,7 @@ It’s very easy to keep the code up to date. :-D
 
 Niobio is Bitcoin but:
 
-* Only 1% of Bitcoin total supply (== 210.000 coins)
+* Only 1% of Bitcoin total supply (== 210,000 coins)
 * 51% attack protection (dns checkpoint)
 
 Dependencies - Same as BTC plus curl:
