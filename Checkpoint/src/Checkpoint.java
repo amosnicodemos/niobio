@@ -20,7 +20,9 @@ public class Checkpoint {
 
 					Thread.sleep(1000);
 
-					Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", "cd ../.. && git push" });
+					Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c",
+							"cd ../.. && git add bestblockhash.txt && git commit -m 'new bestblock' && git push" });
+					System.out.println("git checkpoint");
 
 				} catch (IOException | InterruptedException e) {
 					e.printStackTrace();
@@ -38,7 +40,7 @@ public class Checkpoint {
 
 			// Watch the process
 			watch(process);
-			Thread.sleep(30 * 1000); // 30s
+			Thread.sleep(60 * 1000); // 1 min
 		}
 
 	}
