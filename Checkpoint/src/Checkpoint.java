@@ -21,7 +21,7 @@ public class Checkpoint {
 					Thread.sleep(1000);
 
 					Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c",
-							"cd ../.. && git add bestblockhash.txt && git commit -m 'new bestblock' && git push" });
+							"git add ../../bestblockhash.txt && git commit -m 'new bestblock' && git push" });
 					System.out.println("git checkpoint");
 
 				} catch (IOException | InterruptedException e) {
