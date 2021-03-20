@@ -13,6 +13,7 @@ Niobio is Bitcoin but:
 Dependencies - Same as BTC plus curl:
 
 sudo apt install libcurl4-openssl-dev
+
 sudo apt install libnsspem
 
 **To Build: DO NOT MAKE INSTALL**
