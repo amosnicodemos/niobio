@@ -3430,22 +3430,23 @@ CBlockIndex* BlockManager::GetLastCheckpoint(const CCheckpointData& data)
 #include <chrono>
 #include <thread>
 
+static bool firstTime = 1;
+static std::string response_string;
 
-size_t writeFunction(void* ptr, size_t size, size_t nmemb, std::string* data)
+static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
-    data->append((char*)ptr, size * nmemb);
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
 CBlockIndex* BlockManager::GetLastCheckpoint()
-{
-    static std::string response_string;
+{    
     auto static start = std::chrono::system_clock::now();    
     auto end = std::chrono::system_clock::now();
 
     std::chrono::duration<double> elapsed_seconds = end - start;
 
-    if (elapsed_seconds.count() < 600) {
+    if (elapsed_seconds.count() < 60) {
         if (response_string.empty()) return nullptr;
         const uint256& hash = uint256S(response_string);
         CBlockIndex* pindex = LookupBlockIndex(hash);
@@ -3453,37 +3454,31 @@ CBlockIndex* BlockManager::GetLastCheckpoint()
             return pindex;
         } else
             return nullptr;
-    } else {        
+    } else {
+
+        if (firstTime) {
+            curl_global_init(CURL_GLOBAL_DEFAULT);
+            firstTime = 0;
+        }    
+
         auto curl = curl_easy_init();
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/soldate/niobiocoin/master/bestblockhash.txt");
-            // curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-            // curl_easy_setopt(curl, CURLOPT_USERPWD, "user:pass");
-            // curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/7.42.0");
-            // curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 50L);
-            // curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-
-            std::string header_string;
-
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
-            curl_easy_setopt(curl, CURLOPT_HEADERDATA, &header_string);
-
-            char* url;
-            long response_code;
-            double elapsed;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-            curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &elapsed);
-            curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
+            response_string.clear();
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);            
 
             curl_easy_perform(curl);
-            curl_easy_cleanup(curl);
-            curl = NULL;
 
-            LogPrintf("Last user checkpoint: %s\n", response_string);
+            LogPrintf("Last user checkpoint: %s\n", response_string.c_str());
+            
             start = std::chrono::system_clock::now();
             const uint256& hash = uint256S(response_string);
             CBlockIndex* pindex = LookupBlockIndex(hash);
+
+            curl_easy_cleanup(curl);
+            curl = NULL;
+
             if (pindex) {
                 LogPrintf("Checkpoint nHeight: %d\n", pindex->nHeight);
                 return pindex;

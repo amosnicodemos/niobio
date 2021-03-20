@@ -24,7 +24,6 @@
 #include <util/url.h>
 
 #include <functional>
-#include <curl/curl.h>
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 UrlDecodeFn* const URL_DECODE = urlDecode;
@@ -158,7 +157,6 @@ int main(int argc, char* argv[])
 
     // Connect bitcoind signal handlers
     noui_connect();
-
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+        
     return (AppInit(argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
