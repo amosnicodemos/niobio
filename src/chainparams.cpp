@@ -91,7 +91,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT; // December 31, 2008
 
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000a800a800aa");
+        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000012613ad03e87");
         consensus.defaultAssumeValid = uint256();
 
         /**
@@ -156,6 +156,9 @@ public:
                 {2000, uint256S("00000000160927efa16c05a4e891ace185cd792c297ed8a9909f08b5e1db4968")},
                 {2400, uint256S("00000000059f728ab14f3bc2e0554faf95764f67b82f78fb2c7727307ad85d6c")},
                 {2800, uint256S("00000000ca7a2f75b680f30eca76522f54c549fd202b86c4df703cb4db630666")},
+                {3500, uint256S("00000000203ce85aee919539f6f1a1db1189ce0046795e692f603eb83f30f435")},
+                {4000, uint256S("000000007afcfc9ed08237c108dc3f5072623fcac9b0e54e7afe6489a5f843ad")},
+                {4500, uint256S("000000002a56187a8656a31a8c973b61860ef920e8b49cb9b1ba13e57d3a0864")},
             }
         };
 
