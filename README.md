@@ -44,7 +44,7 @@ sudo apt install libcurl4-openssl-dev libnsspem
 *Please rename bin file bitcoind to niobiocoind*
 * mv ./src/bitcoind ./src/niobiocoind
 
-**To Run**
+**To Run: SET FALLBACKFEE**
 
 niobiocoind -fallbackfee=0.00001
 
