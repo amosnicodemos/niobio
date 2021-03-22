@@ -12,18 +12,36 @@ Niobio is Bitcoin but:
 
 Dependencies - Same as BTC plus curl and nsspem:
 
-sudo apt install libcurl4-openssl-dev
+**Ubuntu**
 
-sudo apt install libnsspem
+sudo apt-get install build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
+
+sudo apt-get install libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev
+
+sudo apt install libsqlite3-dev
+
+sudo apt install libminiupnpc-dev libnatpmp-dev
+
+sudo apt install libzmq3-dev
+
+sudo apt install libcurl4-openssl-dev libnsspem
 
 **To Build: DO NOT MAKE INSTALL**
 
 * ./autogen.sh
-* ./configure
+* ./configure --with-incompatible-bdb
 * ./make 
 * mv ./src/bitcoind ./src/niobiocoind
 
 *Please rename bin file bitcoind to niobiocoind*
 * mv ./src/bitcoind ./src/niobiocoind
 
+**To Run**
+
+niobiocoind -fallbackfee=0.00001
+
 Your data folder in /home/youruser/.niobiocoin
+
+
+
+
