@@ -12,11 +12,19 @@ Niobio is Bitcoin but:
 
 Dependencies - Same as BTC plus curl and nsspem:
 
-**Ubuntu**
+**Ubuntu 18**
 
-sudo apt-get install build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
+sudo apt install autoconf
 
-sudo apt-get install libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev
+sudo add-apt-repository ppa:bitcoin/bitcoin
+
+sudo apt update
+
+sudo apt install libdb4.8-dev libdb4.8++-dev
+
+sudo apt install build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
+
+sudo apt install libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev
 
 sudo apt install libsqlite3-dev
 
@@ -29,7 +37,7 @@ sudo apt install libcurl4-openssl-dev libnsspem
 **To Build: DO NOT MAKE INSTALL**
 
 * ./autogen.sh
-* ./configure --with-incompatible-bdb
+* ./configure
 * ./make 
 * mv ./src/bitcoind ./src/niobiocoind
 
@@ -41,7 +49,3 @@ sudo apt install libcurl4-openssl-dev libnsspem
 niobiocoind -fallbackfee=0.00001
 
 Your data folder in /home/youruser/.niobiocoin
-
-
-
-
