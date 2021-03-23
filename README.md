@@ -14,25 +14,19 @@ Dependencies - Same as BTC plus curl and nsspem:
 
 **Ubuntu 18**
 
-sudo apt install autoconf
+sudo apt update
+
+sudo apt install -y autoconf build-essential libtool autotools-dev automake pkg-config bsdmainutils python3 libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev libboost-thread-dev libsqlite3-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev libcurl4-openssl-dev libnsspem
 
 sudo add-apt-repository ppa:bitcoin/bitcoin
 
 sudo apt update
 
-sudo apt install libdb4.8-dev libdb4.8++-dev
+sudo apt install -y libdb4.8++ libdb4.8++-dev libdb4.8-dev
 
-sudo apt install build-essential libtool autotools-dev automake pkg-config bsdmainutils python3
+git clone https://github.com/soldate/niobiocoin.git
 
-sudo apt install libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev
-
-sudo apt install libsqlite3-dev
-
-sudo apt install libminiupnpc-dev libnatpmp-dev
-
-sudo apt install libzmq3-dev
-
-sudo apt install libcurl4-openssl-dev libnsspem
+cd niobiocoin
 
 **To Build: DO NOT MAKE INSTALL**
 
