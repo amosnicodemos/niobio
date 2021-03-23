@@ -38,7 +38,7 @@ cd niobiocoin
 *Please rename bin file bitcoind to niobiocoind*
 * mv ./src/bitcoind ./src/niobiocoind
 
-**To Run: SET FALLBACKFEE**
+**To Run**
 
 niobiocoind -fallbackfee=0.00001
 
