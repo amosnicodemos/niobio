@@ -91,7 +91,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT; // December 31, 2008
 
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000012613ad03e87");
+        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000024289615b572");
         consensus.defaultAssumeValid = uint256();
 
         /**
@@ -159,6 +159,13 @@ public:
                 {3500, uint256S("00000000203ce85aee919539f6f1a1db1189ce0046795e692f603eb83f30f435")},
                 {4000, uint256S("000000007afcfc9ed08237c108dc3f5072623fcac9b0e54e7afe6489a5f843ad")},
                 {4500, uint256S("000000002a56187a8656a31a8c973b61860ef920e8b49cb9b1ba13e57d3a0864")},
+                {5000, uint256S("000000002ed83f3c132c429648e3ae0b064b7b92e5a92e0ef9c1af74947eb35c")},
+                {5500, uint256S("000000002876112da519da0d427b5b304c15673d9b06726b9fc94f3bd437db70")},
+                {6000, uint256S("0000000040a0d6bb550659f71261faf6a2ecd90f07eb357b3f3b51e144988459")},
+                {6500, uint256S("0000000054fc97960dbdfbef77b7548d68ba589ab11a01d9855f909e94c0304c")},
+                {7000, uint256S("000000004157b44c0a992ac7562f746d30e873c008d9c5a6d67c02b4e76d6053")},
+                {7500, uint256S("00000000077cfff923733fde0ff4562875580288a1d22a6074bddb9db9f35575")},
+                {8000, uint256S("00000000610256f968e781a9f9cf3abaa8924ffbb3f9afae96c8c19cdd7b929f")},
             }
         };
 
