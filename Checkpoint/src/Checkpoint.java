@@ -41,7 +41,7 @@ public class Checkpoint {
 
 			// Watch the process
 			watch(process);
-			Thread.sleep(60 * 60 * 1000); // 1h
+			Thread.sleep(10 * 60 * 1000); // 10m
 		}
 
 	}
