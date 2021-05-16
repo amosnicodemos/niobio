@@ -111,6 +111,8 @@ BASE_SCRIPTS = [
     'wallet_listtransactions.py --legacy-wallet',
     'wallet_listtransactions.py --descriptors',
     'feature_taproot.py',
+    'rpc_signer.py',
+    'wallet_signer.py --descriptors',
     # vv Tests less than 60s vv
     'p2p_sendheaders.py',
     'wallet_importmulti.py --legacy-wallet',
@@ -203,6 +205,7 @@ BASE_SCRIPTS = [
     'feature_notifications.py',
     'rpc_getblockfilter.py',
     'rpc_invalidateblock.py',
+    'feature_utxo_set_hash.py',
     'feature_rbf.py',
     'mempool_packages.py',
     'mempool_package_onemore.py',
@@ -277,6 +280,8 @@ BASE_SCRIPTS = [
     'p2p_ping.py',
     'rpc_scantxoutset.py',
     'feature_logging.py',
+    'feature_anchors.py',
+    'feature_coinstatsindex.py',
     'p2p_node_network_limited.py',
     'p2p_permissions.py',
     'feature_blocksdir.py',
@@ -284,10 +289,12 @@ BASE_SCRIPTS = [
     'feature_config_args.py',
     'feature_settings.py',
     'rpc_getdescriptorinfo.py',
+    'rpc_addresses_deprecation.py',
     'rpc_help.py',
     'feature_help.py',
     'feature_shutdown.py',
     'p2p_ibd_txrelay.py',
+    'feature_blockfilterindex_prune.py'
     # Don't append tests at the end to avoid merge conflicts
     # Put them in a random line within the section that fits their approximate run-time
 ]

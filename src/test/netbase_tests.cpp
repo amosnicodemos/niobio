@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <net_permissions.h>
+#include <netaddress.h>
 #include <netbase.h>
 #include <protocol.h>
 #include <serialize.h>
@@ -83,31 +84,31 @@ BOOST_AUTO_TEST_CASE(netbase_properties)
 
 }
 
-bool static TestSplitHost(std::string test, std::string host, int port)
+bool static TestSplitHost(const std::string& test, const std::string& host, uint16_t port)
 {
     std::string hostOut;
-    int portOut = -1;
+    uint16_t portOut{0};
     SplitHostPort(test, portOut, hostOut);
     return hostOut == host && port == portOut;
 }
 
 BOOST_AUTO_TEST_CASE(netbase_splithost)
 {
-    BOOST_CHECK(TestSplitHost("www.bitcoincore.org", "www.bitcoincore.org", -1));
-    BOOST_CHECK(TestSplitHost("[www.bitcoincore.org]", "www.bitcoincore.org", -1));
+    BOOST_CHECK(TestSplitHost("www.bitcoincore.org", "www.bitcoincore.org", 0));
+    BOOST_CHECK(TestSplitHost("[www.bitcoincore.org]", "www.bitcoincore.org", 0));
     BOOST_CHECK(TestSplitHost("www.bitcoincore.org:80", "www.bitcoincore.org", 80));
     BOOST_CHECK(TestSplitHost("[www.bitcoincore.org]:80", "www.bitcoincore.org", 80));
-    BOOST_CHECK(TestSplitHost("127.0.0.1", "127.0.0.1", -1));
+    BOOST_CHECK(TestSplitHost("127.0.0.1", "127.0.0.1", 0));
     BOOST_CHECK(TestSplitHost("127.0.0.1:8333", "127.0.0.1", 8333));
-    BOOST_CHECK(TestSplitHost("[127.0.0.1]", "127.0.0.1", -1));
+    BOOST_CHECK(TestSplitHost("[127.0.0.1]", "127.0.0.1", 0));
     BOOST_CHECK(TestSplitHost("[127.0.0.1]:8333", "127.0.0.1", 8333));
-    BOOST_CHECK(TestSplitHost("::ffff:127.0.0.1", "::ffff:127.0.0.1", -1));
+    BOOST_CHECK(TestSplitHost("::ffff:127.0.0.1", "::ffff:127.0.0.1", 0));
     BOOST_CHECK(TestSplitHost("[::ffff:127.0.0.1]:8333", "::ffff:127.0.0.1", 8333));
     BOOST_CHECK(TestSplitHost("[::]:8333", "::", 8333));
-    BOOST_CHECK(TestSplitHost("::8333", "::8333", -1));
+    BOOST_CHECK(TestSplitHost("::8333", "::8333", 0));
     BOOST_CHECK(TestSplitHost(":8333", "", 8333));
     BOOST_CHECK(TestSplitHost("[]:8333", "", 8333));
-    BOOST_CHECK(TestSplitHost("", "", -1));
+    BOOST_CHECK(TestSplitHost("", "", 0));
 }
 
 bool static TestParse(std::string src, std::string canon)
@@ -394,6 +395,28 @@ BOOST_AUTO_TEST_CASE(netpermissions_test)
     BOOST_CHECK(NetWhitebindPermissions::TryParse("@1.2.3.4:32", whitebindPermissions, error));
     BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, PF_NONE);
 
+    NetWhitebindPermissions noban, noban_download, download_noban, download;
+
+    // "noban" implies "download"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("noban@1.2.3.4:32", noban, error));
+    BOOST_CHECK_EQUAL(noban.m_flags, NetPermissionFlags::PF_NOBAN);
+    BOOST_CHECK(NetPermissions::HasFlag(noban.m_flags, NetPermissionFlags::PF_DOWNLOAD));
+    BOOST_CHECK(NetPermissions::HasFlag(noban.m_flags, NetPermissionFlags::PF_NOBAN));
+
+    // "noban,download" is equivalent to "noban"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("noban,download@1.2.3.4:32", noban_download, error));
+    BOOST_CHECK_EQUAL(noban_download.m_flags, noban.m_flags);
+
+    // "download,noban" is equivalent to "noban"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("download,noban@1.2.3.4:32", download_noban, error));
+    BOOST_CHECK_EQUAL(download_noban.m_flags, noban.m_flags);
+
+    // "download" excludes (does not imply) "noban"
+    BOOST_REQUIRE(NetWhitebindPermissions::TryParse("download@1.2.3.4:32", download, error));
+    BOOST_CHECK_EQUAL(download.m_flags, NetPermissionFlags::PF_DOWNLOAD);
+    BOOST_CHECK(NetPermissions::HasFlag(download.m_flags, NetPermissionFlags::PF_DOWNLOAD));
+    BOOST_CHECK(!NetPermissions::HasFlag(download.m_flags, NetPermissionFlags::PF_NOBAN));
+
     // Happy path, can parse flags
     BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,forcerelay@1.2.3.4:32", whitebindPermissions, error));
     // forcerelay should also activate the relay permission
@@ -406,7 +429,7 @@ BOOST_AUTO_TEST_CASE(netpermissions_test)
 
     // Allow dups
     BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,relay,noban,noban@1.2.3.4:32", whitebindPermissions, error));
-    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, PF_BLOOMFILTER | PF_RELAY | PF_NOBAN);
+    BOOST_CHECK_EQUAL(whitebindPermissions.m_flags, PF_BLOOMFILTER | PF_RELAY | PF_NOBAN | PF_DOWNLOAD); // "noban" implies "download"
 
     // Allow empty
     BOOST_CHECK(NetWhitebindPermissions::TryParse("bloom,relay,,noban@1.2.3.4:32", whitebindPermissions, error));
@@ -427,6 +450,8 @@ BOOST_AUTO_TEST_CASE(netpermissions_test)
     // Happy path for whitelist parsing
     BOOST_CHECK(NetWhitelistPermissions::TryParse("noban@1.2.3.4", whitelistPermissions, error));
     BOOST_CHECK_EQUAL(whitelistPermissions.m_flags, PF_NOBAN);
+    BOOST_CHECK(NetPermissions::HasFlag(whitelistPermissions.m_flags, NetPermissionFlags::PF_NOBAN));
+
     BOOST_CHECK(NetWhitelistPermissions::TryParse("bloom,forcerelay,noban,relay@1.2.3.4/32", whitelistPermissions, error));
     BOOST_CHECK_EQUAL(whitelistPermissions.m_flags, PF_BLOOMFILTER | PF_FORCERELAY | PF_NOBAN | PF_RELAY);
     BOOST_CHECK(error.empty());

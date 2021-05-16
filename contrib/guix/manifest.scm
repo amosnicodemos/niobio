@@ -3,6 +3,7 @@
              (gnu packages autotools)
              (gnu packages base)
              (gnu packages bash)
+             (gnu packages bison)
              (gnu packages cdrom)
              (gnu packages check)
              (gnu packages cmake)
@@ -26,9 +27,11 @@
              (gnu packages version-control)
              (guix build-system font)
              (guix build-system gnu)
+             (guix build-system python)
              (guix build-system trivial)
              (guix download)
              (guix gexp)
+             (guix git-download)
              ((guix licenses) #:prefix license:)
              (guix packages)
              (guix profiles)
@@ -115,7 +118,8 @@ http://www.linuxfromscratch.org/hlfs/view/development/chapter05/gcc-pass1.html"
        `(("binutils" ,xbinutils)
          ("libc" ,xlibc)
          ("libc:static" ,xlibc "static")
-         ("gcc" ,xgcc)))
+         ("gcc" ,xgcc)
+         ("gcc-lib" ,xgcc "lib")))
       (synopsis (string-append "Complete GCC tool chain for " target))
       (description (string-append "This package provides a complete GCC tool
 chain for " target " development."))
@@ -124,10 +128,10 @@ chain for " target " development."))
 
 (define* (make-bitcoin-cross-toolchain target
                                   #:key
-                                  (base-gcc-for-libc gcc-5)
-                                  (base-kernel-headers linux-libre-headers-4.19)
-                                  (base-libc glibc-2.27)
-                                  (base-gcc (make-gcc-rpath-link gcc-9)))
+                                  (base-gcc-for-libc gcc-7)
+                                  (base-kernel-headers linux-libre-headers-5.4)
+                                  (base-libc glibc)  ; glibc 2.31
+                                  (base-gcc (make-gcc-rpath-link gcc-8)))
   "Convenience wrapper around MAKE-CROSS-TOOLCHAIN with default values
 desirable for building Bitcoin Core release binaries."
   (make-cross-toolchain target
@@ -145,7 +149,7 @@ desirable for building Bitcoin Core release binaries."
          (pthreads-xlibc mingw-w64-x86_64-winpthreads)
          (pthreads-xgcc (make-gcc-with-pthreads
                          (cross-gcc target
-                                    #:xgcc (make-ssp-fixed-gcc gcc-9)
+                                    #:xgcc (make-ssp-fixed-gcc gcc-8)
                                     #:xbinutils xbinutils
                                     #:libc pthreads-xlibc))))
     ;; Define a meta-package that propagates the resulting XBINUTILS, XLIBC, and
@@ -159,7 +163,8 @@ desirable for building Bitcoin Core release binaries."
       (propagated-inputs
        `(("binutils" ,xbinutils)
          ("libc" ,pthreads-xlibc)
-         ("gcc" ,pthreads-xgcc)))
+         ("gcc" ,pthreads-xgcc)
+         ("gcc-lib" ,pthreads-xgcc "lib")))
       (synopsis (string-append "Complete GCC tool chain for " target))
       (description (string-append "This package provides a complete GCC tool
 chain for " target " development."))
@@ -189,6 +194,29 @@ chain for " target " development."))
     "Thatcher Ulrich's first outline font design. He started with the goal of producing a neutral, readable sans-serif text font. There are lots of \"expressive\" fonts out there, but he wanted to start with something very plain and clean, something he might want to actually use. ")
    (license license:public-domain)))
 
+(define-public lief
+  (package
+   (name "python-lief")
+   (version "0.11.4")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/lief-project/LIEF.git")
+           (commit version)))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32
+       "0h4kcwr9z478almjqhmils8imfpflzk0r7d05g4xbkdyknn162qf"))))
+   (build-system python-build-system)
+   (native-inputs
+    `(("cmake" ,cmake)))
+   (home-page "https://github.com/lief-project/LIEF")
+   (synopsis "Library to Instrument Executable Formats")
+   (description "Python library to to provide a cross platform library which can
+parse, modify and abstract ELF, PE and MachO formats.")
+   (license license:asl2.0)))
+
 (packages->manifest
  (append
   (list ;; The Basics
@@ -211,30 +239,32 @@ chain for " target " development."))
         gzip
         xz
         zlib
+        (list zlib "static")
         ;; Build tools
         gnu-make
         libtool
         autoconf
         automake
         pkg-config
+        bison
         ;; Scripting
         perl
-        python-3.7
+        python-3
         ;; Git
         git
+        ;; Tests
+        lief
         ;; Native gcc 7 toolchain
-        gcc-toolchain-7)
+        gcc-toolchain-7
+        (list gcc-toolchain-7 "static"))
   (let ((target (getenv "HOST")))
     (cond ((string-suffix? "-mingw32" target)
            ;; Windows
            (list zip
                  (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
                  (make-nsis-with-sde-support nsis-x86_64)))
-          ((string-contains target "riscv64-linux-")
-           (list (make-bitcoin-cross-toolchain "riscv64-linux-gnu"
-                                               #:base-gcc-for-libc gcc-7)))
           ((string-contains target "-linux-")
            (list (make-bitcoin-cross-toolchain target)))
           ((string-contains target "darwin")
-           (list clang-8 libcap binutils imagemagick libtiff librsvg font-tuffy cmake-3.15.5 xorriso))
+           (list clang-toolchain-10 binutils imagemagick libtiff librsvg font-tuffy cmake xorriso))
           (else '())))))

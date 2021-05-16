@@ -32,7 +32,7 @@ cd niobiocoin
 
 * ./autogen.sh
 * ./configure
-* ./make 
+* make 
 * mv ./src/bitcoind ./src/niobiocoind
 
 *Please rename bin file bitcoind to niobiocoind*
