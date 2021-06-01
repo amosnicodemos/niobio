@@ -3133,7 +3133,7 @@ CBlockIndex* BlockManager::GetLastCheckpoint(const CCheckpointData& data)
     }
     return nullptr;
 }
-
+/*
 #include <curl/curl.h>
 #include <chrono>
 #include <thread>
@@ -3196,6 +3196,7 @@ CBlockIndex* BlockManager::GetLastCheckpoint()
 
     return nullptr;
 }
+*/
 
 /** Context-dependent validity checks.
  *  By "context", we mean only the previous block headers, but not the UTXO
@@ -3227,11 +3228,13 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidatio
             LogPrintf("ERROR: %s: forked chain older than last checkpoint (height %d)\n", __func__, nHeight);
             return state.Invalid(BlockValidationResult::BLOCK_CHECKPOINT, "bad-fork-prior-to-checkpoint");
         }
+        /*
         pcheckpoint = blockman.GetLastCheckpoint();
         if (pcheckpoint && nHeight < pcheckpoint->nHeight) {
             LogPrintf("ERROR: %s: forked chain older than last checkpoint (height %d)\n", __func__, nHeight);
             return state.Invalid(BlockValidationResult::BLOCK_CHECKPOINT, "bad-fork-prior-to-checkpoint");
         }
+        */
     }
 
     // Check timestamp against prev

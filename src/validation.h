@@ -443,7 +443,7 @@ public:
     //! Returns last CBlockIndex* that is a checkpoint
     CBlockIndex* GetLastCheckpoint(const CCheckpointData& data) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
-    CBlockIndex* GetLastCheckpoint() EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    // CBlockIndex* GetLastCheckpoint() EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
     /**
      * Return the spend height, which is one more than the inputs.GetBestBlock().
