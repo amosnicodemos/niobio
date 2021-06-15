@@ -16,7 +16,7 @@ Dependencies - Same as BTC plus curl and nsspem:
 
 sudo apt update
 
-sudo apt install -y autoconf build-essential libtool autotools-dev automake pkg-config bsdmainutils python3 libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev libboost-thread-dev libsqlite3-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev libcurl4-openssl-dev libnsspem
+sudo apt install -y autoconf build-essential libtool autotools-dev automake pkg-config bsdmainutils python3 libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev libboost-thread-dev libsqlite3-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev libcurl4-openssl-dev libnsspem libcurl4-nss-dev
 
 sudo add-apt-repository ppa:bitcoin/bitcoin
 
