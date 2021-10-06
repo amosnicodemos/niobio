@@ -4,12 +4,15 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the wallet accounts properly when there are cloned transactions with malleated scriptsigs."""
 
-import io
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     assert_equal,
+    find_vout_for_address
 )
-from test_framework.messages import CTransaction, COIN
+from test_framework.messages import (
+    COIN,
+    tx_from_hex,
+)
 
 
 class TxnMallTest(BitcoinTestFramework):
@@ -31,6 +34,13 @@ class TxnMallTest(BitcoinTestFramework):
         super().setup_network()
         self.disconnect_nodes(1, 2)
 
+    def spend_txid(self, txid, vout, outputs):
+        inputs = [{"txid": txid, "vout": vout}]
+        tx = self.nodes[0].createrawtransaction(inputs, outputs)
+        tx = self.nodes[0].fundrawtransaction(tx)
+        tx = self.nodes[0].signrawtransactionwithwallet(tx['hex'])
+        return self.nodes[0].sendrawtransaction(tx['hex'])
+
     def run_test(self):
         if self.options.segwit:
             output_type = "p2sh-segwit"
@@ -47,6 +57,7 @@ class TxnMallTest(BitcoinTestFramework):
         node0_address1 = self.nodes[0].getnewaddress(address_type=output_type)
         node0_txid1 = self.nodes[0].sendtoaddress(node0_address1, 1219)
         node0_tx1 = self.nodes[0].gettransaction(node0_txid1)
+        self.nodes[0].lockunspent(False, [{"txid":node0_txid1, "vout": find_vout_for_address(self.nodes[0], node0_txid1, node0_address1)}])
 
         node0_address2 = self.nodes[0].getnewaddress(address_type=output_type)
         node0_txid2 = self.nodes[0].sendtoaddress(node0_address2, 29)
@@ -59,8 +70,8 @@ class TxnMallTest(BitcoinTestFramework):
         node1_address = self.nodes[1].getnewaddress()
 
         # Send tx1, and another transaction tx2 that won't be cloned
-        txid1 = self.nodes[0].sendtoaddress(node1_address, 40)
-        txid2 = self.nodes[0].sendtoaddress(node1_address, 20)
+        txid1 = self.spend_txid(node0_txid1, find_vout_for_address(self.nodes[0], node0_txid1, node0_address1), {node1_address: 40})
+        txid2 = self.spend_txid(node0_txid2, find_vout_for_address(self.nodes[0], node0_txid2, node0_address2), {node1_address: 20})
 
         # Construct a clone of tx1, to be malleated
         rawtx1 = self.nodes[0].getrawtransaction(txid1, 1)
@@ -71,8 +82,7 @@ class TxnMallTest(BitcoinTestFramework):
         clone_raw = self.nodes[0].createrawtransaction(clone_inputs, clone_outputs, clone_locktime)
 
         # createrawtransaction randomizes the order of its outputs, so swap them if necessary.
-        clone_tx = CTransaction()
-        clone_tx.deserialize(io.BytesIO(bytes.fromhex(clone_raw)))
+        clone_tx = tx_from_hex(clone_raw)
         if (rawtx1["vout"][0]["value"] == 40 and clone_tx.vout[0].nValue != 40*COIN or rawtx1["vout"][0]["value"] != 40 and clone_tx.vout[0].nValue == 40*COIN):
             (clone_tx.vout[0], clone_tx.vout[1]) = (clone_tx.vout[1], clone_tx.vout[0])
 
@@ -83,7 +93,7 @@ class TxnMallTest(BitcoinTestFramework):
 
         # Have node0 mine a block, if requested:
         if (self.options.mine_block):
-            self.nodes[0].generate(1)
+            self.generate(self.nodes[0], 1)
             self.sync_blocks(self.nodes[0:2])
 
         tx1 = self.nodes[0].gettransaction(txid1)
@@ -113,13 +123,13 @@ class TxnMallTest(BitcoinTestFramework):
             return
 
         # ... mine a block...
-        self.nodes[2].generate(1)
+        self.generate(self.nodes[2], 1)
 
         # Reconnect the split network, and sync chain:
         self.connect_nodes(1, 2)
         self.nodes[2].sendrawtransaction(node0_tx2["hex"])
         self.nodes[2].sendrawtransaction(tx2["hex"])
-        self.nodes[2].generate(1)  # Mine another block to make sure we sync
+        self.generate(self.nodes[2], 1)  # Mine another block to make sure we sync
         self.sync_blocks()
 
         # Re-fetch transaction info:
