@@ -3067,70 +3067,6 @@ CBlockIndex* BlockManager::GetLastCheckpoint(const CCheckpointData& data)
     }
     return nullptr;
 }
-/*
-#include <curl/curl.h>
-#include <chrono>
-#include <thread>
-
-static bool firstTime = 1;
-static std::string response_string;
-
-static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
-{
-    ((std::string*)userp)->append((char*)contents, size * nmemb);
-    return size * nmemb;
-}
-
-CBlockIndex* BlockManager::GetLastCheckpoint()
-{
-    auto static start = std::chrono::system_clock::now();
-    auto end = std::chrono::system_clock::now();
-
-    std::chrono::duration<double> elapsed_seconds = end - start;
-
-    if (elapsed_seconds.count() < 60) {
-        if (response_string.empty()) return nullptr;
-        const uint256& hash = uint256S(response_string);
-        CBlockIndex* pindex = LookupBlockIndex(hash);
-        if (pindex) {
-            return pindex;
-        } else
-            return nullptr;
-    } else {
-
-        if (firstTime) {
-            curl_global_init(CURL_GLOBAL_DEFAULT);
-            firstTime = 0;
-        }
-
-        auto curl = curl_easy_init();
-        if (curl) {
-            curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/soldate/niobiocoin/master/bestblockhash.txt");
-            response_string.clear();
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
-
-            curl_easy_perform(curl);
-
-            LogPrintf("Last user checkpoint: %s\n", response_string.c_str());
-
-            start = std::chrono::system_clock::now();
-            const uint256& hash = uint256S(response_string);
-            CBlockIndex* pindex = LookupBlockIndex(hash);
-
-            curl_easy_cleanup(curl);
-            curl = NULL;
-
-            if (pindex) {
-                LogPrintf("Checkpoint nHeight: %d\n", pindex->nHeight);
-                return pindex;
-            }
-        }
-    }
-
-    return nullptr;
-}
-*/
 
 /** Context-dependent validity checks.
  *  By "context", we mean only the previous block headers, but not the UTXO
@@ -3161,13 +3097,6 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, BlockValidatio
             LogPrintf("ERROR: %s: forked chain older than last checkpoint (height %d)\n", __func__, nHeight);
             return state.Invalid(BlockValidationResult::BLOCK_CHECKPOINT, "bad-fork-prior-to-checkpoint");
         }
-        /*
-        pcheckpoint = blockman.GetLastCheckpoint();
-        if (pcheckpoint && nHeight < pcheckpoint->nHeight) {
-            LogPrintf("ERROR: %s: forked chain older than last checkpoint (height %d)\n", __func__, nHeight);
-            return state.Invalid(BlockValidationResult::BLOCK_CHECKPOINT, "bad-fork-prior-to-checkpoint");
-        }
-        */
     }
 
     // Check timestamp against prev

@@ -21,8 +21,7 @@ libs = [
     'libbitcoin_wallet',
     'libbitcoin_zmq',
     'bench_bitcoin',
-    'libtest_util',
-    'culr',
+    'libtest_util'
 ]
 
 ignore_list = [
