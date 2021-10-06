@@ -1605,8 +1605,8 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     // is enforced in ContextualCheckBlockHeader(); we wouldn't want to
     // re-enforce that rule here (at least until we make it impossible for
     // GetAdjustedTime() to go backward).
-    if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
-        if (!CheckBlock(block, state, chainparams.GetConsensus(), !fJustCheck, !fJustCheck)) {
+    if (block.GetHash() != m_params.GetConsensus().hashGenesisBlock) {
+        if (!CheckBlock(block, state, m_params.GetConsensus(), !fJustCheck, !fJustCheck)) {
             if (state.GetResult() == BlockValidationResult::BLOCK_MUTATED) {
                 // We don't write down blocks to disk if they may have been
                 // corrupted, so this should be impossible unless we're having hardware
@@ -1736,11 +1736,11 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     // post BIP34 before approximately height 486,000,000 and presumably will
     // be reset before it reaches block 1,983,702 and starts doing unnecessary
     // BIP30 checking again.
-    if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
+    if (block.GetHash() != m_params.GetConsensus().hashGenesisBlock) {
         assert(pindex->pprev);
-        CBlockIndex *pindexBIP34height = pindex->pprev->GetAncestor(chainparams.GetConsensus().BIP34Height);
+        CBlockIndex* pindexBIP34height = pindex->pprev->GetAncestor(m_params.GetConsensus().BIP34Height);
         //Only continue to enforce if we're below BIP34 activation height or the block hash at that height doesn't correspond.
-        fEnforceBIP30 = fEnforceBIP30 && (!pindexBIP34height || !(pindexBIP34height->GetBlockHash() == chainparams.GetConsensus().BIP34Hash));
+        fEnforceBIP30 = fEnforceBIP30 && (!pindexBIP34height || !(pindexBIP34height->GetBlockHash() == m_params.GetConsensus().BIP34Hash));
     }
 
     // TODO: Remove BIP30 checking from block height 1,983,702 on, once we have a
@@ -1759,7 +1759,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
 
     // Enforce BIP68 (sequence locks)
     int nLockTimeFlags = 0;
-    if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
+    if (block.GetHash() != m_params.GetConsensus().hashGenesisBlock) {
         if (DeploymentActiveAt(*pindex, m_params.GetConsensus(), Consensus::DEPLOYMENT_CSV)) {
           nLockTimeFlags |= LOCKTIME_VERIFY_SEQUENCE;
         }
@@ -1856,8 +1856,8 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
 
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
-    if (block.vtx[0]->GetValueOut() > blockReward && block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
+    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, m_params.GetConsensus());
+    if (block.vtx[0]->GetValueOut() > blockReward && block.GetHash() != m_params.GetConsensus().hashGenesisBlock) {
         LogPrintf("ERROR: ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)\n", block.vtx[0]->GetValueOut(), blockReward);
         return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-cb-amount");
     }
@@ -1872,8 +1872,8 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     if (fJustCheck)
         return true;
 
-    if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
-        if (!WriteUndoDataForBlock(blockundo, state, pindex, chainparams))
+    if (block.GetHash() != m_params.GetConsensus().hashGenesisBlock) {
+        if (!WriteUndoDataForBlock(blockundo, state, pindex, m_params))
             return false;
     }
 
