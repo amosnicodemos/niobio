@@ -3,13 +3,15 @@ Niobio (NBR) = 99,9% Bitcoin (BTC)
 
 Bitcoin clone. Minimal changes. 
 
-It’s very easy to keep the code up to date. :-D
+Fixed reward of two coins per block.
+
+The code is always updated.
 
 **Ubuntu 18**
 
 sudo apt update
 
-sudo apt install -y autoconf build-essential libtool autotools-dev automake pkg-config bsdmainutils python3 libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev libboost-thread-dev libsqlite3-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev libcurl4-openssl-dev
+sudo apt install -y autoconf build-essential libtool autotools-dev automake pkg-config bsdmainutils python3 libevent-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-test-dev libboost-thread-dev libsqlite3-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev
 
 sudo add-apt-repository ppa:bitcoin/bitcoin
 
@@ -23,8 +25,8 @@ cd niobiocoin
 
 **To Build: DO NOT MAKE INSTALL**
 
-* ./autogen.sh
-* ./configure
+* sudo ./autogen.sh
+* sudo ./configure
 * make 
 * mv ./src/bitcoind ./src/niobiocoind
 
